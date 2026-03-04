@@ -178,4 +178,30 @@ The app name in `package.json` is `facility-monitoring-dashboard`. Run `npm run 
 
 ---
 
+## Conversation 4
+
+### User
+
+Portfolio Data: Each originator exports data in their own format, status vocabularies vary across facilities. Let's create .json files to later test the UI.
+
+[User pasted full spec for Facility A — Educa Capital I (facility_a_educa_isa.json, 8 assets), Facility B — PayEarly US (facility_b_payearly_ewa.json, 8 assets), Facility C — Nomina Express I (facility_c_nomina.json, 8 assets), and covenant_results.json with pre-computed covenant results for all three facilities.]
+
+---
+
+### Assistant (response)
+
+Created four JSON files under `data/`:
+
+1. **data/facility_a_educa_isa.json** — 8 assets, Educa Capital I (ISA / Education Loans). Fields: external_id, effective_date, reporting_date, status, is_eligible, student_id, school_id, loan_status, disbursement_amount, outstanding_amount, repaid_amount, interest_rate_percentage, days_past_due, country, amount. Intentionally kept status/value inconsistencies (e.g. "open", "Open", "OPEN"; "closed"; null interest_rate_percentage on one asset) for data-quality testing.
+
+2. **data/facility_b_payearly_ewa.json** — 8 assets, PayEarly US (Earned Wage Access). Fields: external_id, created_at, due_date, last_updated, status, is_eligible, employer_id, employer_name, employee_id, user_state, total_principal_amount, outstanding_principal_amount, repaid_principal_amount, total_fee_amount, outstanding_fee_amount, receivable_currency, days_past_due, amount. Status vocabulary: "defaulted", "PERFORMING", "performing", "delinquent", "Performing", "repaid".
+
+3. **data/facility_c_nomina.json** — 8 assets, Nomina Express I (Salary Advance). Fields: external_id, origination_date, cutoff_date, status, is_eligible, employer_name, employer_tax_id, net_monthly_salary, advance_amount, outstanding_amount, repaid_amount, fee_percentage, fee_amount, days_past_due, maturity_date (DD/MM/YYYY), amount. Status: "active", "ACTIVE", "past_due", "written_off", "settled".
+
+4. **data/covenant_results.json** — computed_at, and per facility: facility_id, name, asset_class, currency, covenant (metric, computed_rate, threshold, operator, status, breach_consequence), summary (total_assets, included, excluded), included_assets (ids), excluded_assets (id + reasons). All three facilities are COMPLIANT in this dataset.
+
+You can load these from the app via fetch (e.g. from `public/` if you copy them there) or by importing from `data/` in the service layer.
+
+---
+
 *Transcript will be updated as the conversation continues.*

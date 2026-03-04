@@ -1,0 +1,98 @@
+{
+  "computed_at": "2026-01-20T18:00:00Z",
+  "facilities": [
+    {
+      "facility_id": "facility_a",
+      "name": "Educa Capital I",
+      "asset_class": "ISA / Education Loans",
+      "currency": "EUR",
+      "covenant": {
+        "metric": "Weighted Average Loan IRR",
+        "computed_rate": 18.33,
+        "threshold": 22.0,
+        "operator": "below",
+        "status": "COMPLIANT",
+        "breach_consequence": "New disbursements paused"
+      },
+      "summary": {
+        "total_assets": 8,
+        "included": 5,
+        "excluded": 3
+      },
+      "included_assets": [
+        "EDU-STU-10001",
+        "EDU-STU-10002",
+        "EDU-STU-10004",
+        "EDU-STU-10005",
+        "EDU-STU-10007"
+      ],
+      "excluded_assets": [
+        { "id": "EDU-STU-10003", "reasons": ["is_eligible is false", "loan_status is 'delinquent' (not current)"] },
+        { "id": "EDU-STU-10006", "reasons": ["status is 'closed' (not open)", "is_eligible is false", "loan_status is 'written_off' (not current)"] },
+        { "id": "EDU-STU-10008", "reasons": ["interest_rate_percentage is null"] }
+      ]
+    },
+    {
+      "facility_id": "facility_b",
+      "name": "PayEarly US",
+      "asset_class": "Earned Wage Access",
+      "currency": "USD",
+      "covenant": {
+        "metric": "Annualized Fee Yield",
+        "computed_rate": 0.03,
+        "threshold": 3.0,
+        "operator": "below",
+        "status": "COMPLIANT",
+        "breach_consequence": "Advance Cap Review triggered"
+      },
+      "summary": {
+        "total_assets": 8,
+        "included": 5,
+        "excluded": 3
+      },
+      "included_assets": [
+        "b60d823e-618e-4f08-9c98-cf65264151f0",
+        "c71e934f-729f-5a19-ad09-da76375262a1",
+        "d82fa45a-830a-6b20-be10-eb87486373b2",
+        "f04bc67c-a52c-8d42-da32-ad09608595d4",
+        "g15cd78d-b63d-9e53-eb43-be10719606e5"
+      ],
+      "excluded_assets": [
+        { "id": "a49c66dd-507d-4087-8ba7-be54153040ef", "reasons": ["status is 'defaulted' (not performing)", "is_eligible is false"] },
+        { "id": "e93ab56b-941b-7c31-cf21-fc98597484c3", "reasons": ["status is 'delinquent' (not performing)"] },
+        { "id": "h26de89e-c74e-0f64-fc54-cf21820717f6", "reasons": ["status is 'repaid' (not performing)", "outstanding_principal_amount is 0"] }
+      ]
+    },
+    {
+      "facility_id": "facility_c",
+      "name": "Nomina Express I",
+      "asset_class": "Salary Advance",
+      "currency": "EUR",
+      "covenant": {
+        "metric": "Weighted Average Annualized Fee",
+        "computed_rate": 3.39,
+        "threshold": 4.0,
+        "operator": "below",
+        "status": "COMPLIANT",
+        "breach_consequence": "Advance ratio must be reduced below 50%"
+      },
+      "summary": {
+        "total_assets": 8,
+        "included": 4,
+        "excluded": 4
+      },
+      "included_assets": [
+        "NOMINA-202406-38893",
+        "NOMINA-202406-16006",
+        "NOMINA-202406-57819",
+        "NOMINA-202406-17331"
+      ],
+      "excluded_assets": [
+        { "id": "NOMINA-202406-30379", "reasons": ["outstanding_amount is 0"] },
+        { "id": "NOMINA-202406-70217", "reasons": ["status is 'past_due' (not active)"] },
+        { "id": "NOMINA-202406-42087", "reasons": ["status is 'written_off' (not active)", "is_eligible is false"] },
+        { "id": "NOMINA-202407-88421", "reasons": ["status is 'settled' (not active)", "is_eligible is false", "outstanding_amount is 0"] }
+      ]
+    }
+  ]
+}

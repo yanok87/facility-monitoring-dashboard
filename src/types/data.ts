@@ -78,6 +78,29 @@ export type EducaCapitalPortfolio = EducaCapitalAsset[];
 export type PayEarlyEwaPortfolio = PayEarlyEwaAsset[];
 export type NominaSalaryAdvancePortfolio = NominaSalaryAdvanceAsset[];
 
+/**
+ * Maps each FacilityId to its asset type. Use when you have a facility id
+ * and need the correct asset/portfolio type (e.g. in the service layer).
+ */
+export interface FacilityAssetMap {
+  facility_a: EducaCapitalAsset;
+  facility_b: PayEarlyEwaAsset;
+  facility_c: NominaSalaryAdvanceAsset;
+}
+
+/** Maps each FacilityId to its portfolio type (array of assets). */
+export interface FacilityPortfolioMap {
+  facility_a: EducaCapitalPortfolio;
+  facility_b: PayEarlyEwaPortfolio;
+  facility_c: NominaSalaryAdvancePortfolio;
+}
+
+/** Get the asset type for a facility. e.g. AssetForFacility<"facility_a"> => EducaCapitalAsset */
+export type AssetForFacility<F extends FacilityId> = FacilityAssetMap[F];
+
+/** Get the portfolio type for a facility. e.g. PortfolioForFacility<"facility_a"> => EducaCapitalAsset[] */
+export type PortfolioForFacility<F extends FacilityId> = FacilityPortfolioMap[F];
+
 // ---------------------------------------------------------------------------
 // Covenant results (pre-computed by backend)
 // ---------------------------------------------------------------------------

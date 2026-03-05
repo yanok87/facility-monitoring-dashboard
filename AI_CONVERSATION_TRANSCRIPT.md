@@ -204,4 +204,26 @@ You can load these from the app via fetch (e.g. from `public/` if you copy them 
 
 ---
 
+## Conversation 5
+
+### User
+
+Ok, let's create types for every data
+
+---
+
+### Assistant (response)
+
+Created TypeScript types for all data in `src/types/`:
+
+- **src/types/data.ts** — Defines:
+  - **Portfolio (per-facility):** `EducaCapitalAsset`, `PayEarlyEwaAsset`, `NominaSalaryAdvanceAsset` (all fields typed; `interest_rate_percentage` is `number | null` for Educa). Also `EducaCapitalPortfolio`, `PayEarlyEwaPortfolio`, `NominaSalaryAdvancePortfolio` as array types, and `PortfolioAsset` union.
+  - **Facility id:** `FacilityId` = `"facility_a" | "facility_b" | "facility_c"`.
+  - **Covenant results:** `Covenant`, `CovenantSummary`, `ExcludedAssetWithReasons`, `FacilityCovenantResult`, `CovenantResults`; plus `CovenantStatus` and `CovenantOperator` for the covenant fields.
+- **src/types/index.ts** — Re-exports all types so you can `import { ... } from '@/types'`.
+
+No linter errors. You can now import from `@/types` or `@/types/data` when building the service layer or UI.
+
+---
+
 *Transcript will be updated as the conversation continues.*

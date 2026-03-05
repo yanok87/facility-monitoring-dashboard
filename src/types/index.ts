@@ -1,0 +1,17 @@
+export type {
+  EducaCapitalAsset,
+  PayEarlyEwaAsset,
+  NominaSalaryAdvanceAsset,
+  PortfolioAsset,
+  FacilityId,
+  EducaCapitalPortfolio,
+  PayEarlyEwaPortfolio,
+  NominaSalaryAdvancePortfolio,
+  CovenantStatus,
+  CovenantOperator,
+  Covenant,
+  CovenantSummary,
+  ExcludedAssetWithReasons,
+  FacilityCovenantResult,
+  CovenantResults,
+} from "./data";

@@ -18,7 +18,7 @@ interface HeroExposureProps {
 
 export function HeroExposure({ overview }: HeroExposureProps) {
   const currencies = Object.entries(overview.totalExposureByCurrency).filter(
-    ([_, v]) => v > 0
+    ([, v]) => v > 0
   );
   const compliant = overview.facilities.filter((f) => f.covenantStatus === COVENANT_STATUS.COMPLIANT).length;
   const inBreach = overview.facilities.filter((f) => f.covenantStatus === COVENANT_STATUS.BREACH).length;

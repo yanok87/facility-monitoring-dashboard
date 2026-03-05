@@ -226,6 +226,61 @@ No linter errors. You can now import from `@/types` or `@/types/data` when build
 
 ---
 
+## Conversation 5b — Data fetching and application architecture
+
+*(This section documents work from commits `a1d76938969d6f47be38c7560958fd6d92b48d07` and `f7cc31eb9d1994852defe6ea56c9d37645a3b5f2`: core data services, adapters, API routes, and clarification of local API behavior.)*
+
+### Summary
+
+The data-fetching layer was built with a **ports-and-adapters** style: the app depends on abstractions (ports), and concrete implementations (adapters) can be swapped (file-based for local/dev, HTTP for a real backend).
+
+**Ports**
+
+- **src/ports/covenant-source.port.ts** — Interface for fetching covenant results (e.g. `getCovenantResults()`).
+- **src/ports/portfolio-source.port.ts** — Interface for fetching portfolio data per facility (e.g. `getPortfolio(facilityId)`).
+
+**Adapters (file-based — default)**
+
+- **src/adapters/file/covenant-file.adapter.ts** — Reads covenant results from the filesystem (e.g. `data/covenant_results.json`).
+- **src/adapters/file/portfolio-file.adapter.ts** — Reads facility portfolios from JSON files; wired via **src/adapters/file/facility-file.config.ts** (base path, file mapping per facility).
+- **src/adapters/file/index.ts** — Re-exports file adapters.
+
+**Adapters (HTTP — for real API)**
+
+- **src/adapters/http/covenant-http.adapter.ts** — Fetches covenant results from a configurable URL.
+- **src/adapters/http/portfolio-http.adapter.ts** — Fetches portfolio per facility from configurable URLs.
+- **src/adapters/http/http-adapters.config.ts** — Builds HTTP adapters from **src/config/urls.ts** (`COVENANT_URL`, `PORTFOLIO_URL_1/2/3`, `FACILITY_IDS`).
+
+**Config**
+
+- **src/config/urls.ts** — Central URL configuration for the HTTP adapters when not using file adapters.
+
+**Domain**
+
+- **src/domain/types.ts** — Normalized types consumed by the UI: `NormalizedStatus`, `NormalizedAssetRow`, `NormalizedCovenant`, `NormalizedFacilityDetail`, `NormalizedFacilitySummary`, `NormalizedOverview`.
+- **src/domain/index.ts** — Re-exports domain types.
+
+**Services**
+
+- **src/services/facility.service.ts** — Core application service: depends only on the ports (covenant + portfolio). Implements `getOverview()` (aggregates covenant + portfolios into `NormalizedOverview`) and `getFacilityDetail(facilityId)` (single facility covenant + summary + normalized portfolio). Uses **src/services/normalization/normalize-status.ts** and **src/services/normalization/normalize-asset.ts** to map raw facility-specific data to the normalized domain types.
+- **src/services/normalization/normalize-status.ts** — Maps originator status strings to `NormalizedStatus`.
+- **src/services/normalization/normalize-asset.ts** — Maps raw portfolio assets (per-facility schema) to `NormalizedAssetRow` (with `rawDetail` for expandable UI).
+
+**Server**
+
+- **src/server/facility-service.server.ts** — Creates the single **FacilityService** instance used by the API. By default wires **file adapters**; a commented block shows how to switch to **HTTP adapters** (uncomment and set URLs in `@/config/urls`).
+
+**API routes (Next.js)**
+
+- **GET /api/overview** — Uses `getFacilityServiceInstance().getOverview()`, returns `NormalizedOverview`.
+- **GET /api/facilities/[facilityId]/detail** — Uses `getFacilityServiceInstance().getFacilityDetail(facilityId)`, returns `NormalizedFacilityDetail` or 404.
+- **GET /api/covenant-results** — Serves raw covenant results (file-backed); used when the app or external clients need the raw covenant payload. Comments clarify that this route is file-only and does not switch between file/HTTP.
+- **GET /api/portfolios/[facilityId]** — Serves raw portfolio for a facility (file-backed). Comments clarify that when using a real backend, portfolio URLs in config typically point at that backend; these routes are for local/file-based usage.
+
+The UI (Dashboard, etc.) fetches only **/api/overview** and **/api/facilities/[id]/detail**; the facility service behind those routes uses whichever adapters are configured (file or HTTP), so switching to a real API is a server-side config change without client changes.
+
+---
+
 ## Conversation 6
 
 ### User
@@ -310,6 +365,38 @@ Various UI and theme follow-ups: (1) Use a specific color for the facility card 
 - **Page bottom:** Dashboard containers use `pt: 4, pb: 8` instead of `py: 4`.
 - **Facility cards:** Switched to CSS Grid. Desktop columns depend on count: 1 card → 3 columns (1/3 width), 2 → 2 columns, 3 → 3 columns, 4 → 4 columns, 5+ → 4 columns with wrap. Mobile: single column, cards centered (maxWidth 360). Removed the temporary test that duplicated facilities for 6 cards.
 - **Hero card:** On mobile, reduced gap and padding: `gap: { xs: 2, md: 6 }`, `p: { xs: 2, md: 3 }`.
+
+---
+
+## Conversation 9
+
+### User
+
+(1) Make the section titles (TOTAL EXPOSURE & OVERVIEW, FACILITIES, FACILITY DETAIL) a bit bigger. (2) Add more horizontal padding inside the portfolio table on desktop. (3) Review the codebase for leftover code (unused imports, debug code, etc.). (4) Asked whether there is error management; requested improvements if needed. (5) Asked why the conversation was not being added to the transcript.
+
+### Assistant (response)
+
+**Section titles**
+
+- In **Dashboard**, all three caption titles now use `fontSize: "0.875rem"` (14px) instead of the default 0.75rem.
+
+**Table padding**
+
+- In **FacilityDetail** table styles, added responsive horizontal padding for cells: `px: { xs: 2, md: 3 }` (later adjusted to `md: 4` in code) so the table has more padding on left/right on desktop.
+
+**Code review**
+
+- Searched for TODO/FIXME, console.log, debugger, unused imports. Fixed **HeroExposure**: removed unused `_` in the filter callback (use `([, v])` instead of `([_, v])`) to clear the lint warning. Confirmed no other leftover debug or dead code; API `console.error` in catch blocks is intentional for server logging.
+
+**Error management**
+
+- Summarized existing behavior: API routes return 500/404 and log errors; overview errors show "Failed to load overview. Please try again."; fetch helpers throw on `!res.ok` so React Query marks queries as failed.
+- **Gap:** Facility detail errors were not surfaced—when detail fetch failed, the UI still showed "Select a facility to see details."
+- **Change:** In **Dashboard**, added `detailError = !!selectedFacilityId && detailQuery.isError`. When true, the FACILITY DETAIL section shows a **Paper** with "Failed to load facility details. Please try again." and a **Retry** button that calls `detailQuery.refetch()`. Imported **Button** and **Paper** for this block.
+
+**Transcript**
+
+- Acknowledged the rule to update the transcript after substantive exchanges and that it had not been applied consistently. Added this exchange as Conversation 9.
 
 ---
 

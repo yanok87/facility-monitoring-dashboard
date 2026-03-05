@@ -3,7 +3,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
+import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { HeroExposure } from "./HeroExposure";
 import { FacilityCards } from "./FacilityCards";
@@ -48,6 +50,7 @@ export function Dashboard() {
   const detailToShow =
     selectedFacilityId && detailQuery.data?.facilityId === selectedFacilityId ? detailQuery.data : null;
   const detailLoading = !!selectedFacilityId && detailQuery.isLoading;
+  const detailError = !!selectedFacilityId && detailQuery.isError;
 
   const handleSelectFacility = (facilityId: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -115,7 +118,18 @@ export function Dashboard() {
         <Typography variant="caption" sx={{ display: "block", mb: 1, fontSize: "0.875rem" }}>
           FACILITY DETAIL
         </Typography>
-        <FacilityDetail detail={detailToShow} isLoading={detailLoading} />
+        {detailError ? (
+          <Paper sx={{ p: 3, textAlign: "center" }}>
+            <Typography color="error" sx={{ mb: 2 }}>
+              Failed to load facility details. Please try again.
+            </Typography>
+            <Button variant="contained" size="small" onClick={() => detailQuery.refetch()}>
+              Retry
+            </Button>
+          </Paper>
+        ) : (
+          <FacilityDetail detail={detailToShow} isLoading={detailLoading} />
+        )}
       </Box>
     </Container>
   );

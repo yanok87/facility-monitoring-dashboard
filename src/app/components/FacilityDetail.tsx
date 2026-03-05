@@ -97,16 +97,16 @@ export function FacilityDetail({ detail, isLoading }: FacilityDetailProps) {
             <Typography variant="caption" sx={{ display: "block", color: "text.secondary" }}>
               Computed rate
             </Typography>
-            <Typography variant="h2" component="span" sx={{ fontSize: "1.5rem" }}>
+            <Typography variant="valueLarge" component="span">
               {covenant.computedRate} {detail.currency}
             </Typography>
           </Box>
-          <Typography variant="h2" component="span" sx={{ fontSize: "1.5rem", pb: 0.25 }}>/</Typography>
+          <Typography variant="valueLarge" component="span" sx={{ pb: 0.25 }}>/</Typography>
           <Box>
             <Typography variant="caption" sx={{ display: "block", color: "text.secondary" }}>
               Threshold
             </Typography>
-            <Typography variant="h2" component="span" sx={{ fontSize: "1.5rem" }}>
+            <Typography variant="valueLarge" component="span">
               {covenant.threshold} {detail.currency}
             </Typography>
           </Box>
@@ -125,7 +125,7 @@ export function FacilityDetail({ detail, isLoading }: FacilityDetailProps) {
               sx={{ height: 8, borderRadius: 1 }}
             />
           </Box>
-          <Typography variant="body2" sx={{ fontWeight: 600, minWidth: 48, textAlign: "right" }}>
+          <Typography variant="subtitle2" sx={{ minWidth: 48, textAlign: "right" }}>
             {ratePct > 100 ? ">100" : ratePct.toFixed(1)}%
           </Typography>
         </Box>

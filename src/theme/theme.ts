@@ -1,3 +1,4 @@
+import "./theme-augmentation";
 import { createTheme } from "@mui/material/styles";
 import { colors } from "./colors";
 
@@ -57,12 +58,15 @@ export const appTheme = createTheme({
   },
   typography: {
     fontFamily: '"Geist", "Inter", system-ui, sans-serif',
+    // Page title (responsive)
     h1: {
-      fontSize: "2.25rem",
-      fontWeight: 700,
+      fontSize: "2rem",
+      fontWeight: 500,
       lineHeight: 1.2,
       letterSpacing: "-0.02em",
       color: colors.text.primary,
+      "@media (min-width:600px)": { fontSize: "2.5rem" },
+      "@media (min-width:900px)": { fontSize: "3rem" },
     },
     h2: {
       fontSize: "1.75rem",
@@ -92,6 +96,42 @@ export const appTheme = createTheme({
       letterSpacing: "0.05em",
       textTransform: "uppercase" as const,
       color: colors.text.hint,
+    },
+    // Section labels (e.g. "TOTAL EXPOSURE & OVERVIEW")
+    overline: {
+      fontSize: "0.875rem",
+      fontWeight: 500,
+      letterSpacing: "0.05em",
+      textTransform: "uppercase" as const,
+      color: colors.text.hint,
+    },
+    // Hero / stat numbers (2rem)
+    heroValue: {
+      fontSize: "2rem",
+      fontWeight: 600,
+      lineHeight: 1.2,
+      color: colors.text.primary,
+    },
+    // Facility card title
+    cardTitle: {
+      fontSize: "1.125rem",
+      fontWeight: 700,
+      lineHeight: 1.4,
+      color: colors.text.primary,
+    },
+    // Covenant numbers (computed rate, threshold)
+    valueLarge: {
+      fontSize: "1.5rem",
+      fontWeight: 600,
+      lineHeight: 1.3,
+      color: colors.text.primary,
+    },
+    // Bold body2 (rate %, exposure, etc.)
+    subtitle2: {
+      fontSize: "0.875rem",
+      fontWeight: 600,
+      lineHeight: 1.5,
+      color: colors.text.secondary,
     },
   },
   shape: {

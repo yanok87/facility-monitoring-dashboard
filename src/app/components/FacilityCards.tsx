@@ -63,10 +63,10 @@ export function FacilityCards({
             }}
           >
             <CardContent sx={{ "&:last-child": { pb: 2 } }}>
-              <Typography variant="h3" sx={{ fontSize: "1.125rem", fontWeight: 700, mb: 1, color: "inherit" }}>
+              <Typography variant="cardTitle" sx={{ mb: 1, color: "inherit" }}>
                 {f.name}
               </Typography>
-              <Typography variant="body2" sx={{ color: selected ? colors.card.selected.textSecondary : colors.text.secondary, mb: 1 }}>
+              <Typography variant="body2" sx={{ color: selected ? colors.card.selected.textSecondary : "text.secondary", mb: 1 }}>
                 {f.assetClass}
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
@@ -82,7 +82,7 @@ export function FacilityCards({
                     }),
                   }}
                 />
-                <Typography variant="body2" component="span" sx={{ fontWeight: 600, color: selected ? colors.card.selected.textMuted : undefined }}>
+                <Typography variant="subtitle2" component="span" sx={{ color: selected ? colors.card.selected.textMuted : undefined }}>
                   {formatExposure(f.currency, f.exposure)}
                 </Typography>
               </Box>

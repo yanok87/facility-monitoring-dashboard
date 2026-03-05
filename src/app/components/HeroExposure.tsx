@@ -39,15 +39,7 @@ export function HeroExposure({ overview }: HeroExposureProps) {
     >
       {currencies.map(([currency, value]) => (
         <Box key={currency} sx={{ textAlign: "center", minWidth: 140 }}>
-          <Typography
-            component="div"
-            sx={{
-              fontSize: "2rem",
-              fontWeight: 600,
-              color: "text.primary",
-              lineHeight: 1.2,
-            }}
-          >
+          <Typography component="div" variant="heroValue">
             {formatMoney(currency, value)}
           </Typography>
           <Typography variant="caption" sx={{ display: "block", mt: 0.5 }}>
@@ -56,15 +48,7 @@ export function HeroExposure({ overview }: HeroExposureProps) {
         </Box>
       ))}
       <Box sx={{ textAlign: "center", minWidth: 140 }}>
-        <Typography
-          component="div"
-          sx={{
-            fontSize: "2rem",
-            fontWeight: 600,
-            color: "text.primary",
-            lineHeight: 1.2,
-          }}
-        >
+        <Typography component="div" variant="heroValue">
           {overview.facilities.length}
         </Typography>
         <Typography variant="caption" sx={{ display: "block", mt: 0.5 }}>
@@ -74,12 +58,8 @@ export function HeroExposure({ overview }: HeroExposureProps) {
       <Box sx={{ textAlign: "center", minWidth: 140 }}>
         <Typography
           component="div"
-          sx={{
-            fontSize: "2rem",
-            fontWeight: 600,
-            color: compliant > 0 ? "success.main" : "text.primary",
-            lineHeight: 1.2,
-          }}
+          variant="heroValue"
+          sx={{ color: compliant > 0 ? "success.main" : undefined }}
         >
           {compliant} / {overview.facilities.length}
         </Typography>
@@ -89,15 +69,7 @@ export function HeroExposure({ overview }: HeroExposureProps) {
       </Box>
       {inBreach > 0 && (
         <Box sx={{ textAlign: "center", minWidth: 140 }}>
-          <Typography
-            component="div"
-            sx={{
-              fontSize: "2rem",
-              fontWeight: 600,
-              color: "error.main",
-              lineHeight: 1.2,
-            }}
-          >
+          <Typography component="div" variant="heroValue" color="error">
             {inBreach}
           </Typography>
           <Typography variant="caption" sx={{ display: "block", mt: 0.5 }}>

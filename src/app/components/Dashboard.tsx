@@ -82,29 +82,19 @@ export function Dashboard() {
         alt="Fence"
         sx={{ display: "block", height: 36, width: "auto", mb: 3 }}
       />
-      <Typography
-        component="h1"
-        sx={{
-          mb: 3,
-          fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
-          fontWeight: 500,
-          lineHeight: 1.2,
-          letterSpacing: "-0.02em",
-          color: "text.primary",
-        }}
-      >
+      <Typography component="h1" variant="h1" sx={{ mb: 3 }}>
         Facility Monitoring
       </Typography>
 
       <Box sx={{ mb: 4 }}>
-        <Typography variant="caption" sx={{ display: "block", mb: 1, fontSize: "0.875rem" }}>
+        <Typography variant="overline" sx={{ display: "block", mb: 1 }}>
           TOTAL EXPOSURE & OVERVIEW
         </Typography>
         <HeroExposure overview={overview} />
       </Box>
 
       <Box sx={{ mb: 2 }}>
-        <Typography variant="caption" sx={{ display: "block", mb: 1, fontSize: "0.875rem" }}>
+        <Typography variant="overline" sx={{ display: "block", mb: 1 }}>
           FACILITIES
         </Typography>
         <FacilityCards
@@ -115,12 +105,12 @@ export function Dashboard() {
       </Box>
 
       <Box sx={{ mt: 4 }}>
-        <Typography variant="caption" sx={{ display: "block", mb: 1, fontSize: "0.875rem" }}>
+        <Typography variant="overline" sx={{ display: "block", mb: 1 }}>
           FACILITY DETAIL
         </Typography>
         {detailError ? (
           <Paper sx={{ p: 3, textAlign: "center" }}>
-            <Typography color="error" sx={{ mb: 2 }}>
+            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
               Failed to load facility details. Please try again.
             </Typography>
             <Button variant="contained" size="small" onClick={() => detailQuery.refetch()}>

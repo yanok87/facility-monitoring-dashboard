@@ -129,7 +129,8 @@ export interface ExcludedAssetWithReasons {
 }
 
 export interface FacilityCovenantResult {
-  facility_id: FacilityId;
+  /** Facility identifier; can be any string when there are N facilities (not limited to 3). */
+  facility_id: string;
   name: string;
   asset_class: string;
   currency: string;

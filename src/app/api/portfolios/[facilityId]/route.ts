@@ -5,8 +5,16 @@ import { NextResponse } from "next/server";
 type Params = { params: Promise<{ facilityId: string }> };
 
 /**
- * Returns raw portfolio data for a facility (for use by HTTP adapters or external clients).
- * Same data as used by the file adapter, exposed over HTTP for testing / real API parity.
+ * Returns raw portfolio data for a facility. Always reads from file (data/*.json).
+ *
+ * Where it’s used:
+ * - When the app uses HTTP adapters and PORTFOLIO_URL_1/2/3 point here (e.g. for local
+ *   testing): PortfolioHttpAdapter fetches these routes, which read files and return JSON.
+ * - External clients that need raw portfolio JSON can call this route directly.
+ *
+ * File vs real API: The data source choice is in facility-service.server.ts. This route
+ * only serves file-backed data over HTTP. For a real API, set the portfolio URLs in
+ * config/urls.ts to the backend; then these routes are unused.
  */
 export async function GET(_request: Request, { params }: Params) {
   try {

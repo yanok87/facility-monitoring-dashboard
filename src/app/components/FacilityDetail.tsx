@@ -15,6 +15,7 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import Chip from "@mui/material/Chip";
 import type { NormalizedFacilityDetail } from "@/domain/types";
+import { COVENANT_STATUS } from "@/domain/types";
 import { colors } from "@/theme/colors";
 import { PortfolioRowLegend } from "./PortfolioRowLegend";
 
@@ -24,12 +25,15 @@ const tableStyles = {
     boxShadow: "none",
     border: `1px solid ${colors.table.rowBorder}`,
     borderRadius: 1,
-    overflow: "hidden",
+    overflowX: "auto",
+    overflowY: "hidden",
   },
   table: {
+    minWidth: 560,
     "& .MuiTableCell-root": {
       borderRight: "none",
       borderBottom: `1px solid ${colors.table.rowBorder}`,
+      px: { xs: 2, md: 4 },
     },
     "& .MuiTableHead .MuiTableCell-root": {
       bgcolor: colors.table.headerBg,
@@ -109,7 +113,7 @@ export function FacilityDetail({ detail, isLoading }: FacilityDetailProps) {
           <Chip
             size="small"
             label={covenant.status}
-            color={covenant.status === "COMPLIANT" ? "success" : "error"}
+            color={covenant.status === COVENANT_STATUS.COMPLIANT ? "success" : "error"}
           />
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1, mt: 0.5 }}>
@@ -117,7 +121,7 @@ export function FacilityDetail({ detail, isLoading }: FacilityDetailProps) {
             <LinearProgress
               variant="determinate"
               value={Math.min(ratePct, 100)}
-              color={covenant.status === "COMPLIANT" ? "success" : "error"}
+              color={covenant.status === COVENANT_STATUS.COMPLIANT ? "success" : "error"}
               sx={{ height: 8, borderRadius: 1 }}
             />
           </Box>

@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import type { NormalizedFacilitySummary } from "@/domain/types";
+import { COVENANT_STATUS } from "@/domain/types";
 import { colors } from "@/theme/colors";
 
 interface FacilityCardsProps {
@@ -25,13 +26,17 @@ export function FacilityCards({
   selectedFacilityId,
   onSelect,
 }: FacilityCardsProps) {
+  const columnCount =
+    facilities.length <= 1 ? 3 : facilities.length === 2 ? 2 : facilities.length <= 4 ? facilities.length : 4;
+  const gridColumns = `repeat(${columnCount}, 1fr)`;
+
   return (
     <Box
       sx={{
-        display: "flex",
-        flexWrap: "wrap",
+        display: "grid",
         gap: 2,
-        justifyContent: "flex-start",
+        gridTemplateColumns: { xs: "1fr", md: gridColumns },
+        justifyItems: { xs: "center", md: "stretch" },
       }}
     >
       {facilities.map((f) => {
@@ -43,18 +48,17 @@ export function FacilityCards({
             data-selected={selected}
             elevation={0}
             sx={{
-              flex: "1 1 200px",
-              minWidth: 200,
-              maxWidth: 360,
+              width: { xs: "100%", md: "auto" },
+              maxWidth: { xs: 360, md: "none" },
               cursor: "pointer",
               border: "none",
               borderRadius: 2,
               bgcolor: selected ? colors.card.highlight : colors.card.pastel,
-              color: selected ? "#FFFFFF" : colors.text.primary,
+              color: selected ? colors.card.selected.text : colors.text.primary,
               transition: "background-color 0.2s, box-shadow 0.2s",
               "&:hover": {
-                bgcolor: selected ? colors.card.highlight : "#BAE6FD",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                bgcolor: selected ? colors.card.highlight : colors.card.pastelHover,
+                boxShadow: colors.shadow.cardHover,
               },
             }}
           >
@@ -62,27 +66,27 @@ export function FacilityCards({
               <Typography variant="h3" sx={{ fontSize: "1.125rem", fontWeight: 700, mb: 1, color: "inherit" }}>
                 {f.name}
               </Typography>
-              <Typography variant="body2" sx={{ color: selected ? "rgba(255,255,255,0.9)" : colors.text.secondary, mb: 1 }}>
+              <Typography variant="body2" sx={{ color: selected ? colors.card.selected.textSecondary : colors.text.secondary, mb: 1 }}>
                 {f.assetClass}
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
                 <Chip
                   size="small"
                   label={f.covenantStatus}
-                  color={f.covenantStatus === "COMPLIANT" ? "success" : "error"}
+                  color={f.covenantStatus === COVENANT_STATUS.COMPLIANT ? "success" : "error"}
                   sx={{
                     ...(selected && {
-                      bgcolor: "rgba(255,255,255,0.25)",
-                      color: "#FFFFFF",
-                      "& .MuiChip-label": { color: "#FFFFFF" },
+                      bgcolor: colors.card.selected.chipBg,
+                      color: colors.card.selected.chipLabel,
+                      "& .MuiChip-label": { color: colors.card.selected.chipLabel },
                     }),
                   }}
                 />
-                <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
+                <Typography variant="body2" component="span" sx={{ fontWeight: 600, color: selected ? colors.card.selected.textMuted : undefined }}>
                   {formatExposure(f.currency, f.exposure)}
                 </Typography>
               </Box>
-              <Typography variant="caption" sx={{ display: "block", mt: 1, color: selected ? "rgba(255,255,255,0.85)" : colors.text.hint }}>
+              <Typography variant="caption" sx={{ display: "block", mt: 1, color: selected ? colors.card.selected.textMuted : colors.text.hint }}>
                 {f.covenantMetric}: {f.covenantRate} / {f.covenantThreshold} {f.currency}
               </Typography>
             </CardContent>

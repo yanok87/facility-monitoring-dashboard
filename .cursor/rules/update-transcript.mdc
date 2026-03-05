@@ -1,0 +1,27 @@
+---
+description: Keep AI_CONVERSATION_TRANSCRIPT.md updated with every conversation
+alwaysApply: true
+---
+
+# Update conversation transcript
+
+The project keeps a full transcript of AI conversations in **AI_CONVERSATION_TRANSCRIPT.md** at the project root.
+
+## Rule
+
+**After completing any substantive exchange** (code changes, multi-step tasks, or meaningful Q&A), update the transcript:
+
+1. Open `AI_CONVERSATION_TRANSCRIPT.md`.
+2. Append a new section in the same format as existing ones:
+   - `## Conversation N` (use the next number after the last `## Conversation` in the file).
+   - `### User` — Short summary of what the user asked or requested (can be one or two sentences).
+   - `### Assistant (response)` — Concise summary of what was implemented or answered: list changes (files, behavior), and any important clarifications or decisions.
+3. Keep the existing trailing line: `*Transcript will be updated as the conversation continues.*`
+
+## When to update
+
+- After finishing a task or set of edits (e.g. feature, refactor, bugfix).
+- After answering questions that affect understanding of the codebase or decisions.
+- You may batch several small back-and-forth turns into one “Conversation N” if they form a single topic.
+
+Do not add a new section for every single message; group by topic or task. When in doubt, add an update at the end of your response so the transcript stays current.

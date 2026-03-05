@@ -69,10 +69,20 @@ export const colors = {
   card: {
     /** Default card background (pastel blue) */
     pastel: "#E0F2FF",
+    /** Hover background when card is not selected */
+    pastelHover: "#BAE6FD",
     /** Highlighted / selected card (vibrant blue) */
     highlight: "#007BFF",
     /** Icon container outline */
     iconOutline: "#E2E8F0",
+    /** Colors when card is selected (on highlight background) */
+    selected: {
+      text: "#FFFFFF",
+      textSecondary: "rgba(255,255,255,0.9)",
+      textMuted: "rgba(255,255,255,0.85)",
+      chipBg: "rgba(255,255,255,0.25)",
+      chipLabel: "#FFFFFF",
+    },
   },
 
   // Tables (Fence comparison style)
@@ -100,6 +110,14 @@ export const colors = {
 
   // Excluded row (portfolio table)
   excludedRow: "rgba(220, 38, 38, 0.08)",
+
+  // Shadows (single source of truth for box-shadow values)
+  shadow: {
+    /** Default card/panel shadow */
+    sm: "0 1px 3px rgba(0,0,0,0.06)",
+    /** Card hover / elevated shadow */
+    cardHover: "0 2px 8px rgba(0,0,0,0.06)",
+  },
 } as const;
 
 export type ColorScheme = typeof colors;

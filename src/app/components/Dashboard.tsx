@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -9,54 +9,45 @@ import { HeroExposure } from "./HeroExposure";
 import { FacilityCards } from "./FacilityCards";
 import { FacilityDetail } from "./FacilityDetail";
 import type { NormalizedOverview, NormalizedFacilityDetail } from "@/domain/types";
+import { getStaleTimeUntilMidnightUTC } from "@/lib/query-utils";
+
+async function fetchOverview(): Promise<NormalizedOverview> {
+  const res = await fetch("/api/overview");
+  if (!res.ok) throw new Error("Failed to fetch overview");
+  return res.json();
+}
+
+async function fetchFacilityDetail(facilityId: string): Promise<NormalizedFacilityDetail> {
+  const res = await fetch(`/api/facilities/${facilityId}/detail`);
+  if (!res.ok) throw new Error(`Failed to fetch facility detail: ${facilityId}`);
+  return res.json();
+}
 
 export function Dashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [overview, setOverview] = useState<NormalizedOverview | null>(null);
-  const [detail, setDetail] = useState<NormalizedFacilityDetail | null>(null);
-  const [defaultFacilityId, setDefaultFacilityId] = useState<string | null>(null);
 
+  const overviewQuery = useQuery({
+    queryKey: ["overview"],
+    queryFn: fetchOverview,
+    staleTime: getStaleTimeUntilMidnightUTC(),
+  });
+
+  const overview = overviewQuery.data;
   const selectedFromUrl = searchParams.get("facility");
-  const selectedFacilityId = selectedFromUrl ?? defaultFacilityId;
+  const selectedFacilityId =
+    selectedFromUrl ?? overview?.facilities[0]?.facilityId ?? null;
 
-  // Fetch overview on mount; set default facility when no URL param (async callback is ok)
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/overview")
-      .then((res) => res.json())
-      .then((data: NormalizedOverview) => {
-        if (!cancelled) {
-          setOverview(data);
-          if (data.facilities.length > 0) {
-            setDefaultFacilityId((prev) => prev ?? data.facilities[0].facilityId);
-          }
-        }
-      })
-      .catch((err) => console.error("Overview fetch error:", err));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Fetch facility detail when selection changes (setState only in async callbacks)
-  useEffect(() => {
-    if (!selectedFacilityId) return;
-    let cancelled = false;
-    fetch(`/api/facilities/${selectedFacilityId}/detail`)
-      .then((res) => res.json())
-      .then((data: NormalizedFacilityDetail) => {
-        if (!cancelled) setDetail(data);
-      })
-      .catch((err) => console.error("Detail fetch error:", err));
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedFacilityId]);
+  const detailQuery = useQuery({
+    queryKey: ["facility-detail", selectedFacilityId ?? ""],
+    queryFn: () => fetchFacilityDetail(selectedFacilityId!),
+    enabled: !!selectedFacilityId,
+    staleTime: getStaleTimeUntilMidnightUTC(),
+  });
 
   const detailToShow =
-    selectedFacilityId && detail?.facilityId === selectedFacilityId ? detail : null;
-  const detailLoading = selectedFacilityId != null && detail?.facilityId !== selectedFacilityId;
+    selectedFacilityId && detailQuery.data?.facilityId === selectedFacilityId ? detailQuery.data : null;
+  const detailLoading = !!selectedFacilityId && detailQuery.isLoading;
 
   const handleSelectFacility = (facilityId: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -64,29 +55,53 @@ export function Dashboard() {
     router.replace("?" + params.toString());
   };
 
-  if (!overview) {
+  if (overviewQuery.isLoading || !overview) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
         <Typography color="text.secondary">Loading overview…</Typography>
       </Container>
     );
   }
 
+  if (overviewQuery.isError) {
+    return (
+      <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
+        <Typography color="error">Failed to load overview. Please try again.</Typography>
+      </Container>
+    );
+  }
+
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h1" sx={{ mb: 3, fontSize: "1.75rem" }}>
+    <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
+      <Box
+        component="img"
+        src="/fence_logo_light_theme.svg"
+        alt="Fence"
+        sx={{ display: "block", height: 36, width: "auto", mb: 3 }}
+      />
+      <Typography
+        component="h1"
+        sx={{
+          mb: 3,
+          fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+          fontWeight: 500,
+          lineHeight: 1.2,
+          letterSpacing: "-0.02em",
+          color: "text.primary",
+        }}
+      >
         Facility Monitoring
       </Typography>
 
       <Box sx={{ mb: 4 }}>
-        <Typography variant="caption" sx={{ display: "block", mb: 1 }}>
+        <Typography variant="caption" sx={{ display: "block", mb: 1, fontSize: "0.875rem" }}>
           TOTAL EXPOSURE & OVERVIEW
         </Typography>
         <HeroExposure overview={overview} />
       </Box>
 
       <Box sx={{ mb: 2 }}>
-        <Typography variant="caption" sx={{ display: "block", mb: 1 }}>
+        <Typography variant="caption" sx={{ display: "block", mb: 1, fontSize: "0.875rem" }}>
           FACILITIES
         </Typography>
         <FacilityCards
@@ -97,7 +112,7 @@ export function Dashboard() {
       </Box>
 
       <Box sx={{ mt: 4 }}>
-        <Typography variant="caption" sx={{ display: "block", mb: 1 }}>
+        <Typography variant="caption" sx={{ display: "block", mb: 1, fontSize: "0.875rem" }}>
           FACILITY DETAIL
         </Typography>
         <FacilityDetail detail={detailToShow} isLoading={detailLoading} />

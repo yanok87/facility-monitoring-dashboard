@@ -3,6 +3,8 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { NormalizedOverview } from "@/domain/types";
+import { COVENANT_STATUS } from "@/domain/types";
+import { colors } from "@/theme/colors";
 
 function formatMoney(currency: string, value: number): string {
   if (value >= 1_000_000) return `${currency} ${(value / 1_000_000).toFixed(1)}M`;
@@ -18,21 +20,21 @@ export function HeroExposure({ overview }: HeroExposureProps) {
   const currencies = Object.entries(overview.totalExposureByCurrency).filter(
     ([_, v]) => v > 0
   );
-  const compliant = overview.facilities.filter((f) => f.covenantStatus === "COMPLIANT").length;
-  const inBreach = overview.facilities.filter((f) => f.covenantStatus === "BREACH").length;
+  const compliant = overview.facilities.filter((f) => f.covenantStatus === COVENANT_STATUS.COMPLIANT).length;
+  const inBreach = overview.facilities.filter((f) => f.covenantStatus === COVENANT_STATUS.BREACH).length;
 
   return (
     <Box
       sx={{
         display: "flex",
         flexWrap: "wrap",
-        gap: 3,
+        gap: { xs: 2, md: 6 },
         justifyContent: "center",
         alignItems: "flex-start",
-        p: 3,
+        p: { xs: 2, md: 3 },
         bgcolor: "background.paper",
         borderRadius: 2,
-        boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+        boxShadow: colors.shadow.sm,
       }}
     >
       {currencies.map(([currency, value]) => (
@@ -41,7 +43,7 @@ export function HeroExposure({ overview }: HeroExposureProps) {
             component="div"
             sx={{
               fontSize: "2rem",
-              fontWeight: 700,
+              fontWeight: 600,
               color: "text.primary",
               lineHeight: 1.2,
             }}
@@ -58,7 +60,7 @@ export function HeroExposure({ overview }: HeroExposureProps) {
           component="div"
           sx={{
             fontSize: "2rem",
-            fontWeight: 700,
+            fontWeight: 600,
             color: "text.primary",
             lineHeight: 1.2,
           }}
@@ -74,7 +76,7 @@ export function HeroExposure({ overview }: HeroExposureProps) {
           component="div"
           sx={{
             fontSize: "2rem",
-            fontWeight: 700,
+            fontWeight: 600,
             color: compliant > 0 ? "success.main" : "text.primary",
             lineHeight: 1.2,
           }}
@@ -91,7 +93,7 @@ export function HeroExposure({ overview }: HeroExposureProps) {
             component="div"
             sx={{
               fontSize: "2rem",
-              fontWeight: 700,
+              fontWeight: 600,
               color: "error.main",
               lineHeight: 1.2,
             }}

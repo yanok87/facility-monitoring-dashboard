@@ -226,4 +226,91 @@ No linter errors. You can now import from `@/types` or `@/types/data` when build
 
 ---
 
+## Conversation 6
+
+### User
+
+Various follow-ups on the facility detail and portfolio table: add a color legend above the table (white = active, grey = excluded, red = past due / delinquent); improve visibility of swatches and borders; move legend colors into the theme; extract a reusable component for the legend; darken the table’s grey background slightly; normalize expandable row labels (e.g. maturity_date → Maturity date). Clarified status meanings (defaulted, written_off) and made defaulted and written_off rows use the same red styling as past_due/delinquent. Then: add TanStack React Query so data isn’t refetched on every card click; use a “fresh until end of day” strategy (staleTime until midnight UTC) and 30-minute gcTime for unused cache; fix the “setState in effect” warning by deriving selectedFacilityId in render. User also asked whether the new TanStack setup works with the HTTP adapters, and requested that all of this be added to the transcript.
+
+### Assistant (response)
+
+**Color legend and table polish**
+
+- Added a small color legend above the portfolio table (next to “included”, “excluded”, “Total assets”) explaining: **white** = active, **grey** = excluded, **red** = past due / delinquent / defaulted / written off. Used visible swatches and stronger borders (theme tokens) for contrast.
+- Moved all legend colors into **src/theme/colors.ts** under `table.legend` (active, activeBorder, excluded, excludedBorder, pastDue, pastDueBorder) so they are not hardcoded.
+- Extracted a **PortfolioRowLegend** component (**src/app/components/PortfolioRowLegend.tsx**) that renders the three items from a small config array; used in FacilityDetail.
+- Slightly darkened the table’s grey background for excluded “other status” rows: `table.rowAlt` changed from `#F8F9FA` to `#F1F3F5` in the theme.
+- In the expandable row detail, added **formatDetailLabel(key)** to turn snake_case keys into Title Case (e.g. `maturity_date` → “Maturity date”) for the `<dt>` labels.
+
+**Status semantics and red rows**
+
+- Clarified in conversation: **defaulted** = obligation in default (non-performing); **written_off** = debt deemed uncollectible, written off. Both are at least as severe as delinquent/past_due.
+- In **FacilityDetail.tsx**, the red row background (same as past_due/delinquent) is now also applied when status is **defaulted** or **written_off** (when the row is excluded). Updated the table comment and **PortfolioRowLegend** label to include “defaulted” and “written off”.
+
+**TanStack React Query (caching, “once per day”)**
+
+- Installed **@tanstack/react-query** and added a client **QueryProvider** (**src/app/QueryProvider.tsx**) in the app layout so the tree can use `useQuery`.
+- Introduced **src/lib/query-utils.ts** with **getStaleTimeUntilMidnightUTC()**: returns milliseconds until the next midnight UTC. Used as **staleTime** for overview and facility-detail queries so data is considered “fresh” for the rest of the calendar day and is not refetched until the next day (when stale).
+- **Dashboard** refactored to use **useQuery** for:
+  - **Overview:** `queryKey: ["overview"]`, `queryFn: fetchOverview`, `staleTime: getStaleTimeUntilMidnightUTC()`.
+  - **Facility detail:** `queryKey: ["facility-detail", selectedFacilityId]`, `queryFn: fetchFacilityDetail`, `enabled: !!selectedFacilityId`, same `staleTime`. Each facility’s detail is cached by id; switching cards uses cache when data is still fresh (same day).
+- Set default **gcTime** in QueryProvider to **30 minutes**: cached data for a facility is kept in memory for 30 minutes after it becomes unused (no component using that query). Explained that **staleTime** = “when to consider data stale (refetch)”, **gcTime** = “how long to keep unused cache in memory”.
+- Removed the **useEffect** that set `defaultFacilityId` when overview loaded, which triggered React’s “setState synchronously in effect” warning. **selectedFacilityId** is now derived during render: `selectedFromUrl ?? overview?.facilities[0]?.facilityId ?? null` (no state, no effect).
+
+**Compatibility with HTTP adapters**
+
+- Confirmed: the TanStack setup only calls the **Next.js API routes** (`/api/overview`, `/api/facilities/[id]/detail`). Those routes use **getFacilityServiceInstance()**, which is built in **facility-service.server.ts** with either file adapters or HTTP adapters. Switching to HTTP adapters (e.g. uncommenting the block and setting COVENANT_URL / PORTFOLIO_URL_*) does not require any client or TanStack changes; the same API routes keep working with the new data source.
+
+---
+
+## Conversation 7
+
+### User
+
+Asked that the transcript be updated with everything we do at all times (not only when manually requested).
+
+### Assistant (response)
+
+- Created a **Cursor rule** so the transcript is kept up to date automatically:
+  - **File:** `.cursor/rules/update-transcript.mdc`
+  - **alwaysApply: true** so it applies in every session.
+- The rule instructs the agent to:
+  - After any substantive exchange (code changes, multi-step tasks, or meaningful Q&A), append a new **Conversation N** section to `AI_CONVERSATION_TRANSCRIPT.md`.
+  - Use the same format: `### User` (short summary of the request) and `### Assistant (response)` (concise summary of what was done or answered).
+  - Batch small back-and-forth into one section when they form a single topic; do not create a new section for every message.
+- This exchange was added to the transcript as Conversation 7.
+
+---
+
+## Conversation 8
+
+### User
+
+Various UI and theme follow-ups: (1) Use a specific color for the facility card exposure text when selected; move all card selected colors and the hover background into the theme (no hardcoded values). (2) Replace hardcoded "COMPLIANT" with a type and constant from the domain (CovenantStatus, COVENANT_STATUS). (3) Audit all components so no colors or shadows are hardcoded—everything in the color scheme; add shadow tokens, update ThemeProvider, page, HeroExposure, FacilityCards. (4) Add the Fence logo (from Desktop) to the page. (5) Style the "Facility Monitoring" title like the Fence website hero (larger, bold); when fontWeight didn’t change, fix by avoiding variant so theme doesn’t override. (6) Make the portfolio table scroll horizontally on mobile. (7) Add more padding at the page bottom. (8) Facility cards: take full width on desktop and center on mobile; then switch to a grid; 1 card → 1/3 width, 2 → 1/2 each, 3–4 → full width, 5+ wrap to next line; remove the extra test cards. (9) Reduce gap and padding in the hero card on mobile.
+
+### Assistant (response)
+
+**Theme and facility cards**
+
+- **Card selected colors:** Added `colors.card.selected` (text, textSecondary, textMuted, chipBg, chipLabel) and `colors.card.pastelHover` in **src/theme/colors.ts**. **FacilityCards** now uses these instead of any hardcoded hex/rgba.
+- **Covenant status:** In **src/domain/types.ts** added `CovenantStatus` type and `COVENANT_STATUS` constant. Replaced all hardcoded `"COMPLIANT"` / `"BREACH"` in FacilityCards, FacilityDetail, and HeroExposure with `COVENANT_STATUS.COMPLIANT` / `COVENANT_STATUS.BREACH`.
+
+**Color and shadow audit**
+
+- Added **shadow** to the theme: `shadow.sm`, `shadow.cardHover`. **theme.ts** MuiCard and **HeroExposure** use `colors.shadow.sm`; **FacilityCards** hover uses `colors.shadow.cardHover`. **ThemeProvider** and **page.tsx** loading/background use `colors.background.default` and `colors.text.secondary` instead of hardcoded hex.
+
+**Logo and title**
+
+- Copied **fence_logo_light_theme.svg** into **public/** and added it above the "Facility Monitoring" heading in **Dashboard** (img, height 36px).
+- **Facility Monitoring** title: larger responsive font size (2rem → 2.5rem → 3rem), fontWeight 700, letterSpacing -0.02em. When a lighter fontWeight (e.g. 500) didn’t apply, fixed by using `component="h1"` without `variant="h1"` so the theme’s h1 styles (including fontWeight 700) no longer override the `sx` fontWeight.
+
+**Layout and mobile**
+
+- **Portfolio table:** TableContainer `overflowX: "auto"`, table `minWidth: 560` so the table scrolls horizontally on narrow viewports.
+- **Page bottom:** Dashboard containers use `pt: 4, pb: 8` instead of `py: 4`.
+- **Facility cards:** Switched to CSS Grid. Desktop columns depend on count: 1 card → 3 columns (1/3 width), 2 → 2 columns, 3 → 3 columns, 4 → 4 columns, 5+ → 4 columns with wrap. Mobile: single column, cards centered (maxWidth 360). Removed the temporary test that duplicated facilities for 6 cards.
+- **Hero card:** On mobile, reduced gap and padding: `gap: { xs: 2, md: 6 }`, `p: { xs: 2, md: 3 }`.
+
+---
+
 *Transcript will be updated as the conversation continues.*

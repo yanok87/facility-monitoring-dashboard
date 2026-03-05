@@ -36,13 +36,21 @@ export interface NormalizedAssetRow {
   rawDetail: Record<string, unknown>;
 }
 
+/** Covenant compliance status */
+export type CovenantStatus = "COMPLIANT" | "BREACH";
+
+export const COVENANT_STATUS: { readonly COMPLIANT: CovenantStatus; readonly BREACH: CovenantStatus } = {
+  COMPLIANT: "COMPLIANT",
+  BREACH: "BREACH",
+};
+
 /** Covenant block for facility detail view */
 export interface NormalizedCovenant {
   metric: string;
   computedRate: number;
   threshold: number;
   operator: "below" | "above" | "equals";
-  status: "COMPLIANT" | "BREACH";
+  status: CovenantStatus;
   breachConsequence: string;
 }
 
@@ -71,7 +79,7 @@ export interface NormalizedFacilitySummary {
   name: string;
   assetClass: string;
   currency: string;
-  covenantStatus: "COMPLIANT" | "BREACH";
+  covenantStatus: CovenantStatus;
   exposure: number;
   covenantRate: number;
   covenantThreshold: number;

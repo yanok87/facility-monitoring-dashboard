@@ -8,6 +8,7 @@ import { createFileAdapters } from "@/adapters/file/facility-file.config";
 // import { createHttpAdaptersFromUrls } from "@/adapters/http";
 
 function getFacilityService(): FacilityService {
+  // --- File adapters (local JSON): for dev/test without real APIs. Uncomment and comment out the HTTP block below. ---
   const basePath = process.cwd();
   const { covenant, portfolio } = createFileAdapters(basePath);
   return new FacilityService(covenant, portfolio);

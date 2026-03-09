@@ -40,6 +40,8 @@ export class PortfolioHttpAdapter implements IPortfolioSource {
       if (res.status === 404) return [];
       throw new Error(`Portfolio API error (${facilityId}): ${res.status} ${res.statusText}`);
     }
-    return res.json() as Promise<PortfolioAsset[]>;
+    const data = await res.json();
+    if (data == null || !Array.isArray(data)) return [];
+    return data as PortfolioAsset[];
   }
 }

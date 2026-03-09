@@ -22,6 +22,13 @@ export class CovenantFileAdapter implements ICovenantSource {
     const fs = await import("fs/promises");
     const filePath = path.join(this.basePath, "data", "covenant_results.json");
     const raw = await fs.readFile(filePath, "utf-8");
-    return JSON.parse(raw) as CovenantResults;
+    const data = JSON.parse(raw) as CovenantResults | null;
+    if (data == null || typeof data !== "object") {
+      return { computed_at: "", facilities: [] };
+    }
+    return {
+      computed_at: typeof data.computed_at === "string" ? data.computed_at : "",
+      facilities: Array.isArray(data.facilities) ? data.facilities : [],
+    };
   }
 }

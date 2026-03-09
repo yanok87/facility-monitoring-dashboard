@@ -16,6 +16,10 @@ export class CovenantHttpAdapter implements ICovenantSource {
     if (!res.ok) {
       throw new Error(`Covenant API error: ${res.status} ${res.statusText}`);
     }
-    return res.json() as Promise<CovenantResults>;
+    const data = await res.json();
+    if (data == null || typeof data !== "object") {
+      return { computed_at: "", facilities: [] };
+    }
+    return data as CovenantResults;
   }
 }
